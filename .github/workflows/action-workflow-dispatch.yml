@@ -21,6 +21,6 @@ jobs:
     - name: Build and push Docker image
       run: |
            docker build . --tag ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }}
-           docker tag testing/welcome:${{ github.event.inputs.release_version }} testing/welcome:latest           
+           docker tag ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }} ghcr.io/fzfr/devops-test:latest           
            docker push ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }}
            docker push ghcr.io/fzfr/devops-test:latest
