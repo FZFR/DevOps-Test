@@ -1,7 +1,7 @@
 version: '3'
 services:
   prod:
-    image: "ghcr.io/fzfr/DevOps-Test:latest"
+    image: "ghcr.io/fzfr/devops-test:latest"
     ports:
       - "8000:5000"
   local:    
