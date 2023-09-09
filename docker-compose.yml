@@ -1,6 +1,10 @@
 version: '3'
 services:
-  web:
-    image: localtesting/welcome
+  prod:
+    image: "ghcr.io/fzfr/DevOps-Test:latest"
     ports:
+      - "8000:5000"
+  local:    
+     image: testing/welcome:local
+     ports:
       - "8000:5000"
