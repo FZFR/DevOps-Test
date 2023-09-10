@@ -48,3 +48,35 @@ The Service directs traffic to the application based on the label selector app: 
 The first Ingress directs HTTP traffic with the host "localhost" to the my-service.
 - Ingress with TLS (letsencrypt):
 The second Ingress configures HTTPS with an SSL certificate from Let's Encrypt for the host "fazza.cybernethicc.com".
+
+6.  High Level Architecture
+
+```bash
+   GitHub Repository
+        |
+   CI/CD Pipeline
+        |
+   Docker Image
+   Registry (Docker Hub)
+        |
+   Google Kubernetes Engine
+        |
+   Kubernetes Pods
+        |
+   Cloud Load Balancer
+        |
+   Cloud Armor
+        |
+   VPC Network
+        |
+   Cloud DNS
+
+```
+In this architecture:
+    - The application code is stored in a GitHub repository for version control and is used to trigger a CI/CD pipeline.
+    - GitHub Actions is used as the CI/CD pipeline to build the Docker image and push it to Docker Hub as a registry.
+    - Google Kubernetes Engine (GKE) is used to deploy the application as Kubernetes pods, providing scalability and high availability.
+    - Cloud Load Balancer is used to distribute incoming traffic to the Kubernetes Cluster.
+    - Cloud Armor provides firewall protection for added security.
+    - VPC Network is used for network isolation.
+    - Cloud DNS is configured for domain management.
