@@ -67,10 +67,7 @@ The second Ingress configures HTTPS with an SSL certificate from Let's Encrypt f
         |
    Cloud Armor
         |
-   VPC Network
-        |
-   Cloud DNS
-
+    Internet
 ```
 In this architecture:  
 - The application code is stored in a GitHub repository for version control and is used to trigger a CI/CD pipeline.
@@ -78,5 +75,3 @@ In this architecture:
 - Google Kubernetes Engine (GKE) is used to deploy the application as Kubernetes pods, providing scalability and high availability.
 - Cloud Load Balancer is used to distribute incoming traffic to the Kubernetes Cluster.
 - Cloud Armor provides firewall protection for added security.
-- VPC Network is used for network isolation.
-- Cloud DNS is configured for domain management.
