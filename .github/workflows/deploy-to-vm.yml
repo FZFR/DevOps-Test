@@ -31,7 +31,16 @@ jobs:
            docker build . --tag ghcr.io/fzfr/devops-test:${{ github.ref_name }}
            docker tag ghcr.io/fzfr/devops-test:${{ github.ref_name }} ghcr.io/fzfr/devops-test:latest           
            docker push ghcr.io/fzfr/devops-test:${{ github.ref_name }}
-           docker push ghcr.io/fzfr/devops-test:latest        
+           docker push ghcr.io/fzfr/devops-test:latest  
+      - name: Create deployment artifact
+        env:
+           GITHUB_SHA: ${{ github.sha }}
+        run: tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=*.github *
+      - name: Store artifact for distribution
+        uses: actions/upload-artifact@v3
+        with:
+           name: app-build-welcome
+           path: ${{ github.sha }}.tar.gz      
       - name: Export deployment matrix
         id: export-deployment-matrix
         run: |
@@ -48,6 +57,19 @@ jobs:
       matrix:
         server: ${{ fromJson(needs.build-and-deploy.outputs.DEPLOYMENT_MATRIX) }}
     steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: app-build-welcome
+      - name: Upload
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST_VM }}
+          username: ${{ secrets.USERNAME_VM }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_VM }}
+          port: ${{ matrix.server.port }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}   
+          source: ${{ github.sha }}.tar.gz
+          target: ${{ matrix.server.path }}/artifacts
       - name: SSH Access
         uses: appleboy/ssh-action@master        
         with:
@@ -55,20 +77,29 @@ jobs:
           username: ${{ secrets.USERNAME_VM }}
           key: ${{ secrets.SSH_PRIVATE_KEY_VM }}
           port: ${{ matrix.server.port }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}          
+          passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}        
+          envs: GITHUB_SHA  
           script: |
-            mkdir -p "${{ matrix.server.path }}releases/welcome-app" && cd "${{ matrix.server.path }}releases/welcome-app"
-            sudo rm -rf docker-compose.yml
-            cat <<EOF > docker-compose.yml
-            version: '3'
-            services:
-                prod:
-                image: "ghcr.io/fzfr/devops-test:latest"
-                ports:
-                    - "8000:5000"
-            EOF
-            docker compose down prod  
-            docker compose up -d prod  
+            mkdir -p "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
+            tar xzf ${{ matrix.server.path }}/artifacts/${GITHUB_SHA}.tar.gz -C "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
+      - name: Activate release
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          RELEASE_PATH: ${{ matrix.server.path }}/releases/${{ github.sha }}
+          ACTIVE_RELEASE_PATH: ${{ matrix.server.path }}/current          
+          BASE_PATH: ${{ matrix.server.path }}          
+        with:
+          host: ${{ secrets.HOST_VM }}
+          username: ${{ secrets.USERNAME_VM }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_VM }}
+          port: ${{ matrix.server.port }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}  
+          envs: GITHUB_SHA,RELEASE_PATH,ACTIVE_RELEASE_PATH,UPLOADS_PATH,BASE_PATH
+          script: |                                
+            ln -s -n -f $RELEASE_PATH $ACTIVE_RELEASE_PATH
+            cd ${{ matrix.server.path }}/current && docker compose down prod                
+            cd ${{ matrix.server.path }}/current && docker compose up -d prod                                
   discord-notification-on-completion:
     name: Discord Notification
     runs-on: [ubuntu-latest]

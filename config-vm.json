@@ -4,6 +4,6 @@
         "port": "22",
         "beforeHooks": "",
         "afterHooks": "",
-        "path": "/usr/share/deploy/welcome/"
+        "path": "/usr/share/deploy/welcome"
     }
 ]
