@@ -57,7 +57,7 @@ jobs:
           port: ${{ matrix.server.port }}
           passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}          
           script: |
-            mkdir -p "${{ matrix.server.path }}/releases/welcome-app" && cd "${{ matrix.server.path }}/releases/welcome-app"
+            mkdir -p "${{ matrix.server.path }}releases/welcome-app" && cd "${{ matrix.server.path }}releases/welcome-app"
             sudo rm -rf docker-compose.yml
             cat <<EOF > docker-compose.yml
             version: '3'
