@@ -1,3 +1,4 @@
+# ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,6 +7,7 @@ data:
   CONFIG_KEY: config_value
 
 ---
+# Secret
 apiVersion: v1
 kind: Secret
 metadata:
@@ -15,6 +17,7 @@ data:
   SECRET_KEY: c2VjcmV0X3NlY3JldF9wYXNzd29yZA==
 
 ---
+# Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,6 +50,7 @@ spec:
                   key: SECRET_KEY
 
 ---
+# Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -60,6 +64,7 @@ spec:
       targetPort: 5000
 
 ---
+# Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -78,6 +83,7 @@ spec:
                   number: 80
 
 ---
+# Ingress with letsencrypt
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
