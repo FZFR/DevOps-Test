@@ -34,7 +34,7 @@ docker-compose up local
   ![Alt Text](https://media.discordapp.net/attachments/732815516158394418/1150388484121567282/image.png)
 
 
-5. K8S config and explanations
+5. K8S config and explanations. 
 This YAML configuration file includes all the specified Kubernetes resources in single file in [here!](./k8s.yaml)  
 - ConfigMap:
 The ConfigMap stores application configuration as key-value pairs.
