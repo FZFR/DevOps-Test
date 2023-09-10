@@ -28,9 +28,9 @@ jobs:
             password: ${{ secrets.GH_TOKEN_REPO }}
       - name: Build and push Docker image
         run: |
-           docker build . --tag ghcr.io/fzfr/devops-test:${{ github.ref }}
-           docker tag ghcr.io/fzfr/devops-test:${{ github.ref }} ghcr.io/fzfr/devops-test:latest           
-           docker push ghcr.io/fzfr/devops-test:${{ github.ref }}
+           docker build . --tag ghcr.io/fzfr/devops-test:${{ github.ref_name }}
+           docker tag ghcr.io/fzfr/devops-test:${{ github.ref_name }} ghcr.io/fzfr/devops-test:latest           
+           docker push ghcr.io/fzfr/devops-test:${{ github.ref_name }}
            docker push ghcr.io/fzfr/devops-test:latest        
       - name: Export deployment matrix
         id: export-deployment-matrix
