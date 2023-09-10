@@ -72,11 +72,11 @@ The second Ingress configures HTTPS with an SSL certificate from Let's Encrypt f
    Cloud DNS
 
 ```
-In this architecture:
-    - The application code is stored in a GitHub repository for version control and is used to trigger a CI/CD pipeline.
-    - GitHub Actions is used as the CI/CD pipeline to build the Docker image and push it to Docker Hub as a registry.
-    - Google Kubernetes Engine (GKE) is used to deploy the application as Kubernetes pods, providing scalability and high availability.
-    - Cloud Load Balancer is used to distribute incoming traffic to the Kubernetes Cluster.
-    - Cloud Armor provides firewall protection for added security.
-    - VPC Network is used for network isolation.
-    - Cloud DNS is configured for domain management.
+In this architecture:  
+- The application code is stored in a GitHub repository for version control and is used to trigger a CI/CD pipeline.
+- GitHub Actions is used as the CI/CD pipeline to build the Docker image and push it to Docker Hub as a registry.
+- Google Kubernetes Engine (GKE) is used to deploy the application as Kubernetes pods, providing scalability and high availability.
+- Cloud Load Balancer is used to distribute incoming traffic to the Kubernetes Cluster.
+- Cloud Armor provides firewall protection for added security.
+- VPC Network is used for network isolation.
+- Cloud DNS is configured for domain management.
