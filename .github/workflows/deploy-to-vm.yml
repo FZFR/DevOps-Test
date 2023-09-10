@@ -67,8 +67,8 @@ jobs:
                 ports:
                     - "8000:5000"
             EOF
-            docker-compose down prod  
-            docker-compose up -d prod  
+            docker compose down prod  
+            docker compose up -d prod  
   discord-notification-on-completion:
     name: Discord Notification
     runs-on: [ubuntu-latest]
