@@ -1,0 +1,88 @@
+name: Deploy application to VM
+
+on:
+  push:
+    tags: "*.*.*"
+
+jobs:
+  build-and-deploy:
+    name: Create deployment artifacts
+    runs-on: [ubuntu-latest]
+    outputs:
+      DEPLOYMENT_MATRIX: ${{ steps.export-deployment-matrix.outputs.DEPLOYMENT_MATRIX }}
+    steps:
+      - name: Cleanup build folder
+        run: |
+          ls -la ./
+          sudo rm -rf ./* || true
+          sudo rm -rf ./.??* || true
+          ls -la ./
+      - name: chmod docker sock
+        run: sudo chmod 666 /var/run/docker.sock
+      - uses: actions/checkout@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GH_TOKEN_REPO }}
+      - name: Build and push Docker image
+        run: |
+           docker build . --tag ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }}
+           docker tag ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }} ghcr.io/fzfr/devops-test:latest           
+           docker push ghcr.io/fzfr/devops-test:${{ github.event.inputs.release_version }}
+           docker push ghcr.io/fzfr/devops-test:latest
+      - name: Export deployment matrix
+        id: export-deployment-matrix
+        run: |
+           delimiter="$(openssl rand -hex 8)"
+           JSON="$(cat ./config-vm.json)"
+           echo "DEPLOYMENT_MATRIX<<${delimiter}" >> "${GITHUB_OUTPUT}"
+           echo "$JSON" >> "${GITHUB_OUTPUT}"
+           echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+  run-build-on-servers:
+    name: "${{ matrix.server.name }}: Prepare release"
+    runs-on: [self-hosted]
+    needs: build-and-deploy
+    strategy:
+      matrix:
+        server: ${{ fromJson(needs.build-and-deploy.outputs.DEPLOYMENT_MATRIX) }}
+    steps:
+      - name: SSH Access
+        uses: appleboy/ssh-action@master        
+        with:
+          host: ${{ secrets.HOST_VM }}
+          username: ${{ secrets.USERNAME_VM }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_VM }}
+          port: ${{ matrix.server.port }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE_VM }}          
+          script: |
+            mkdir -p "${{ matrix.server.path }}/releases/welcome-app" && cd "${{ matrix.server.path }}/releases/welcome-app"
+            sudo rm -rf docker-compose.yml
+            cat <<EOF > docker-compose.yml
+            version: '3'
+            services:
+                prod:
+                image: "ghcr.io/fzfr/devops-test:latest"
+                ports:
+                    - "8000:5000"
+            EOF
+            docker-compose up -d prod  
+  discord-notification-on-completion:
+    name: Discord Notification
+    runs-on: [ubuntu-latest]
+    needs: [run-build-on-servers]
+    steps:
+      - name: Send notification to discord
+        uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_BUILD }}
+          title: Deployment on Prod Environment is successful! 
+          description: |
+            Click [here](http://SECRETIP:8000) to check the prod version!
+            Dont forget to clear the cache or using incognito mode to test!
+          image: ${{ secrets.EMBEDED_IMAGE }}
+          color: 0x0000FF
+          username: ${{ secrets.DISCORD_USERNAME }}
+          avatar_url: ${{ secrets.AVATAR_URL }}

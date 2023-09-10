@@ -1,0 +1,9 @@
+[
+    {
+        "name": "development server 0",               
+        "port": "22",
+        "beforeHooks": "",
+        "afterHooks": "",
+        "path": "/usr/share/deploy/welcome/"
+    }
+]
