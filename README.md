@@ -29,7 +29,7 @@ docker-compose up local
   click this link [here](https://github.com/FZFR/devops-test/actions/workflows/action-workflow-dispatch.yml), then click 'Run Workflow' to choose a branch and input the desired version. Finally, click the 'Run workflow' green button to execute.  
   ![Alt Text](https://media.discordapp.net/attachments/732815516158394418/1150367232631783514/image.png)
 
-- Deploy to VM
+- Deploy to VM  
   Deploy to your VM only requires adding a 'release' tag to the last commit, with the note that the 'release' tag must follow the following forma `*.*.*` which means there are three variables that need to be filled, for example, `1.0.1`, then push it, and it will automatically build and deploy to the connected VM.  
   ![Alt Text](https://media.discordapp.net/attachments/732815516158394418/1150388484121567282/image.png)
 
