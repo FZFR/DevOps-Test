@@ -21,20 +21,20 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-deployment
+  name: welcomeapp
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: my-app
+      app: welcomeapp
   template:
     metadata:
       labels:
-        app: my-app
+        app: welcomeapp
     spec:
       containers:
         - name: my-container
-          image: ghcr.io/fzfr/DevOps-Test:latest
+          image: ghcr.io/fzfr/devops-test:latest
           ports:
             - containerPort: 5000
           env:
@@ -54,14 +54,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-service
+  name: welcome-app
 spec:
   selector:
-    app: my-app
+    app: welcomeapp
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 5000
+      targetPort: 5000     
+  type: LoadBalancer 
 
 ---
 # Ingress
@@ -78,7 +79,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: my-service
+                name: welcome-app
                 port:
                   number: 80
 
@@ -103,6 +104,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: my-service
+                name: welcome-app
                 port:
                   number: 80
